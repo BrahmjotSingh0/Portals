@@ -186,12 +186,20 @@ class Main extends PluginBase implements Listener {
     }
 
     private function isWithinBounds(Vector3 $position, Vector3 $pos1, Vector3 $pos2): bool {
+        $minX = min($pos1->getX(), $pos2->getX());
+        $maxX = max($pos1->getX(), $pos2->getX()) + 1; // Include the max block
+        $minY = min($pos1->getY(), $pos2->getY());
+        $maxY = max($pos1->getY(), $pos2->getY()) + 1; // Include the max block
+        $minZ = min($pos1->getZ(), $pos2->getZ());
+        $maxZ = max($pos1->getZ(), $pos2->getZ()) + 1; // Include the max block
+    
         return (
-            min($pos1->getX(), $pos2->getX()) <= $position->getX() && $position->getX() <= max($pos1->getX(), $pos2->getX()) &&
-            min($pos1->getY(), $pos2->getY()) <= $position->getY() && $position->getY() <= max($pos1->getY(), $pos2->getY()) &&
-            min($pos1->getZ(), $pos2->getZ()) <= $position->getZ() && $position->getZ() <= max($pos1->getZ(), $pos2->getZ())
+            $minX <= $position->getX() && $position->getX() < $maxX &&
+            $minY <= $position->getY() && $position->getY() < $maxY &&
+            $minZ <= $position->getZ() && $position->getZ() < $maxZ
         );
     }
+    
 
     private function savePortals(): void {
         $this->getConfig()->set("portals", $this->portals);
