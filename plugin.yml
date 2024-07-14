@@ -1,0 +1,14 @@
+name: Portals
+main: RealBJsingh\Portals\Main
+version: 1.0.0
+api: [5.0.0]
+author: RealBJsingh
+commands:
+  portal:
+    description: Manage portals
+    usage: /portal <command>
+    permission: portals.command
+permissions:
+  portals.command:
+    description: Allows the player to use the portal commands
+    default: op
