@@ -1,8 +1,8 @@
 name: Portals
-main: RealBJsingh\Portals\Main
+main: BrahmjotSingh0\Portals\Main
 version: 1.0.0
 api: [5.0.0]
-author: RealBJsingh
+author: BrahmjotSingh0
 commands:
   portal:
     description: Manage portals
