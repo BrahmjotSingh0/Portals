@@ -2,6 +2,10 @@
 
 Welcome to the **Portals** plugin for PocketMine-MP! This plugin allows players to create and manage portals that execute commands or display messages when players enter them.
 
+[![](https://poggit.pmmp.io/shield.state/Portals)](https://poggit.pmmp.io/p/Portals)
+[![](https://poggit.pmmp.io/shield.dl.total/Portals)](https://poggit.pmmp.io/p/Portals)
+[![](https://poggit.pmmp.io/shield.api/Portals)](https://poggit.pmmp.io/p/Portals)
+
 ## Features
 
 - Create portals with custom names
@@ -12,16 +16,18 @@ Welcome to the **Portals** plugin for PocketMine-MP! This plugin allows players 
 
 ## Commands
 
-- **/portal create <portalname>**: Create a new portal with the specified name.
+- **/portal create portalname**: Create a new portal with the specified name.
 - **/portal pos1**: Set the first position of the portal by tapping a block.
 - **/portal pos2**: Set the second position of the portal by tapping a block.
-- **/portal addcommand <portalname> <player/server> <command>**: Add a command to be executed when a player enters the specified portal.
-- **/portal msg <portalname> <message>**: Set a message to be displayed when a player enters the specified portal.
-- **/portal delete <portalname>**: Delete the specified portal.
+- **/portal addcommand portalname <player/server> command**: Add a command to be executed when a player enters the specified portal.
+- **/portal msg portalname message**: Set a message to be displayed when a player enters the specified portal.
+- **/portal delete portalname**: Delete the specified portal.
 
+- **Note** : /portal addcommand portalname player command : The command will be executed as the player who entered the portal.
+- **Note** : /portal addcommand portalname server command : The command will be executed as the server console.
 ## Permissions
 
-- **portals.command**: Allows the player to use the portal commands (default: true).
+- **portals.command**: Allows the player to use the portal commands (default: op).
 
 ## Configuration
 
@@ -57,9 +63,7 @@ If you encounter any issues or have any questions, please open an issue on the [
 
 ---
 
-**Author**: RealBJsingh  
+**Author**: BrahmjotSingh0
 **Version**: 1.0.0  
 **API**: 5.0.0  
 **License**: MIT
-
-Thank you for using the Portals plugin! Enjoy creating and managing portals in your PocketMine-MP server!

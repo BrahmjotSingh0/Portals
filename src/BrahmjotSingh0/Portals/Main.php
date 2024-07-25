@@ -20,7 +20,7 @@ use function implode;
 use function max;
 use function min;
 
-class Main extends PluginBase implements Listener{
+class Main extends PluginBase implements Listener {
 
 	/** @var array<int|string, mixed> */
 	private array $portals = [];
@@ -29,37 +29,37 @@ class Main extends PluginBase implements Listener{
 	/** @var array<string, mixed> */
 	private array $positions = [];
 
-	public function onEnable() : void{
+	public function onEnable() : void {
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 		$this->saveDefaultConfig();
 		$this->portals = $this->getConfig()->get("portals", []);
 	}
 
-	public function onDisable() : void{
+	public function onDisable() : void {
 		$this->savePortals();
 	}
 
-	public function onCommand(CommandSender $sender, Command $command, string $label, array $args) : bool{
-		if(!$sender instanceof Player){
+	public function onCommand(CommandSender $sender, Command $command, string $label, array $args) : bool {
+		if(!$sender instanceof Player) {
 			$sender->sendMessage("This command can only be used in-game.");
 			return true;
 		}
 
-		if(count($args) < 1){
+		if(count($args) < 1) {
 			$sender->sendMessage("Usage: /portal <create|pos1|pos2|addcommand|msg|delete>");
 			return true;
 		}
 
 		$subCommand = array_shift($args);
 
-		switch($subCommand){
+		switch($subCommand) {
 			case "create":
-				if(count($args) < 1){
+				if(count($args) < 1) {
 					$sender->sendMessage("Usage: /portal create <portalname>");
 					return true;
 				}
 				$portalName = array_shift($args);
-				if(isset($this->portals[$portalName])){
+				if(isset($this->portals[$portalName])) {
 					$sender->sendMessage("Portal '$portalName' already exists.");
 					return true;
 				}
@@ -75,30 +75,30 @@ class Main extends PluginBase implements Listener{
 				$sender->sendMessage("Creating portal '$portalName'. Use /portal pos1 and /portal pos2 to set the positions.");
 				break;
 			case "pos1":
-				if(isset($this->creatingPortal[$sender->getName()])){
+				if(isset($this->creatingPortal[$sender->getName()])) {
 					$this->positions[$sender->getName()]["pos1"] = true;
 					$sender->sendMessage("Tap a block to set position 1 for portal '{$this->creatingPortal[$sender->getName()]}'.");
-				}else{
+				} else {
 					$sender->sendMessage("You need to create a portal first.");
 				}
 				break;
 			case "pos2":
-				if(isset($this->creatingPortal[$sender->getName()])){
+				if(isset($this->creatingPortal[$sender->getName()])) {
 					$this->positions[$sender->getName()]["pos2"] = true;
 					$sender->sendMessage("Tap a block to set position 2 for portal '{$this->creatingPortal[$sender->getName()]}'.");
-				}else{
+				} else {
 					$sender->sendMessage("You need to create a portal first.");
 				}
 				break;
 			case "addcommand":
-				if(count($args) < 3){
+				if(count($args) < 3) {
 					$sender->sendMessage("Usage: /portal addcommand <portalname> <player/server> <command>");
 					return true;
 				}
 				$portalName = array_shift($args);
 				$executor = array_shift($args);
 				$command = implode(" ", $args);
-				if(!isset($this->portals[$portalName])){
+				if (!isset($this->portals[$portalName])) {
 					$sender->sendMessage("Portal '$portalName' does not exist.");
 					return true;
 				}
@@ -107,13 +107,13 @@ class Main extends PluginBase implements Listener{
 				$sender->sendMessage("Command added to portal '$portalName'.");
 				break;
 			case "msg":
-				if(count($args) < 2){
+				if(count($args) < 2) {
 					$sender->sendMessage("Usage: /portal msg <portalname> <message>");
 					return true;
 				}
 				$portalName = array_shift($args);
 				$message = implode(" ", $args);
-				if(!isset($this->portals[$portalName])){
+				if (!isset($this->portals[$portalName])) {
 					$sender->sendMessage("Portal '$portalName' does not exist.");
 					return true;
 				}
@@ -122,12 +122,12 @@ class Main extends PluginBase implements Listener{
 				$sender->sendMessage("Message for portal '$portalName' set.");
 				break;
 			case "delete":
-				if(count($args) < 1){
+				if(count($args) < 1) {
 					$sender->sendMessage("Usage: /portal delete <portalname>");
 					return true;
 				}
 				$portalName = array_shift($args);
-				if(!isset($this->portals[$portalName])){
+				if (!isset($this->portals[$portalName])) {
 					$sender->sendMessage("Portal '$portalName' does not exist.");
 					return true;
 				}
@@ -143,29 +143,30 @@ class Main extends PluginBase implements Listener{
 		return true;
 	}
 
-	public function onPlayerMove(PlayerMoveEvent $event) : void{
+	public function onPlayerMove(PlayerMoveEvent $event) : void {
 		$player = $event->getPlayer();
 		$position = $player->getPosition();
+		$playerWorldName = $player->getWorld()->getFolderName();
 
-		foreach($this->portals as $name => $data){
-			if(!isset($data["pos1"]) || !isset($data["pos2"])){
-				continue; // Skip if pos1 or pos2 are not set
+		foreach($this->portals as $name => $data) {
+			if (!isset($data["pos1"]) || !isset($data["pos2"]) || $data["world"] !== $playerWorldName) {
+				continue; // Skip if pos1 or pos2 are not set or if the player is not in the same world as the portal
 			}
 
 			$pos1 = new Vector3($data["pos1"]["x"], $data["pos1"]["y"], $data["pos1"]["z"]);
 			$pos2 = new Vector3($data["pos2"]["x"], $data["pos2"]["y"], $data["pos2"]["z"]);
 
-			if($this->isWithinBounds($position, $pos1, $pos2)){
-				if(isset($data["message"])){
+			if($this->isWithinBounds($position, $pos1, $pos2)) {
+				if(isset($data["message"]) && $data["message"] !== "") {
 					$player->sendMessage($data["message"]);
 				}
-				if(isset($data["commands"])){
-					foreach($data["commands"] as $commandData){
+				if(isset($data["commands"])) {
+					foreach($data["commands"] as $commandData) {
 						$executor = $commandData["executor"];
 						$command = $commandData["command"];
-						if($executor === "player"){
+						if($executor === "player") {
 							$this->getServer()->dispatchCommand($player, $command);
-						}elseif($executor === "server"){
+						} elseif($executor === "server") {
 							$this->getServer()->dispatchCommand(new ConsoleCommandSender($this->getServer(), $this->getServer()->getLanguage()), $command);
 						}
 					}
@@ -175,17 +176,17 @@ class Main extends PluginBase implements Listener{
 		}
 	}
 
-	public function onPlayerInteract(PlayerInteractEvent $event) : void{
+	public function onPlayerInteract(PlayerInteractEvent $event) : void {
 		$player = $event->getPlayer();
 		$block = $event->getBlock();
 
-		if(isset($this->positions[$player->getName()]["pos1"])){
+		if(isset($this->positions[$player->getName()]["pos1"])) {
 			$portalName = $this->creatingPortal[$player->getName()];
 			$this->portals[$portalName]["pos1"] = ["x" => $block->getPosition()->getX(), "y" => $block->getPosition()->getY(), "z" => $block->getPosition()->getZ()];
 			unset($this->positions[$player->getName()]["pos1"]);
 			$this->savePortals();
 			$player->sendMessage("Position 1 for portal '$portalName' set.");
-		}elseif(isset($this->positions[$player->getName()]["pos2"])){
+		} elseif(isset($this->positions[$player->getName()]["pos2"])) {
 			$portalName = $this->creatingPortal[$player->getName()];
 			$this->portals[$portalName]["pos2"] = ["x" => $block->getPosition()->getX(), "y" => $block->getPosition()->getY(), "z" => $block->getPosition()->getZ()];
 			unset($this->positions[$player->getName()]["pos2"]);
@@ -195,7 +196,7 @@ class Main extends PluginBase implements Listener{
 		}
 	}
 
-	private function isWithinBounds(Vector3 $position, Vector3 $pos1, Vector3 $pos2) : bool{
+	private function isWithinBounds(Vector3 $position, Vector3 $pos1, Vector3 $pos2) : bool {
 		// Calculate portal dimensions
 		$length = abs($pos1->getX() - $pos2->getX());
 		$breadth = abs($pos1->getZ() - $pos2->getZ());
@@ -213,7 +214,7 @@ class Main extends PluginBase implements Listener{
 		);
 	}
 
-	private function savePortals() : void{
+	private function savePortals() : void {
 		$this->getConfig()->set("portals", $this->portals);
 		$this->getConfig()->save();
 	}
